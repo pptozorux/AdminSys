@@ -43,9 +43,8 @@ def f_thread(vms, type):
     
     with ThreadPoolExecutor(max_workers=4) as executor:
         executor.map(copy_img, vms)
-    for vm in vms:
-        run(["sudo", "ovs-vsctl", "set", "port",f"tap{vm.tap}", f"tag={vm.vlan}"])
-        vm.start()
+        executor.map(lambda vm : run(["sudo", "ovs-vsctl", "set", "port",f"tap{vm.tap}", f"tag={vm.vlan}"]), vms) # config taps port vlan
+        executor.map(lambda vm : vm.start(), vms)
 
 if __name__ == "__main__":
     if len(argv) < 2:
